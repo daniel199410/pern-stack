@@ -1,10 +1,20 @@
-import { Button } from '@mui/material';
+import { Box, Button, AppBar, Container, Toolbar, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Navbar(){
+	const navigate = useNavigate();
 	return (
-		<div>
-			Navbar
-			<Button varian='contained'>Click</Button>
-		</div>
+		<Box sx={{ flexGrow: 1 }}>
+			<AppBar position='static' color='transparent'>
+				<Container>
+					<Toolbar>
+						<Typography variant='h6' sx={{flexGrow: 1}}>
+							<Link to="/" style={{textDecoration: "none", color: "#EEE"}}>PERN Stack</Link>
+						</Typography>
+						<Button variant='contained' onClick={ () => navigate('/tasks/new') }>New Task</Button>
+					</Toolbar>
+				</Container>
+			</AppBar>
+		</Box>
 	)
 }
