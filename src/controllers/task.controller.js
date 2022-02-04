@@ -1,66 +1,56 @@
+
 const pool = require('../db');
 
-const makeRequest = f => {
+const getTasks = async (req, res, next) => {
 	try {
-		f();
-	} catch(error) {
-		res.status(500);
-		res.json({error: 'Ha ocurrido un error'});
+        	const tasks = await pool.query('SELECT * FROM task');
+        	res.json(tasks.rows);
+	}catch(error) {
+		next(error)
 	}
-}
-
-const getTasks = async (req, res) => {
-	makeRequest(async () => {
-		try {
-                	const tasks = await pool.query('SELECT * FROM task');
-                	res.json(tasks.rows);
-        	}catch(error) {
-                	res.status(500);
-                	res.json({error: "Ha ocurrido un error"});
-        	}
-	});
 };
 
 const getTask = async (req, res) => {
-	makeRequest(async () => {
+	try {
 		const { id } = req.params;
-        	const result = await pool.query('SELECT * FROM task WHERE id = $1', [id]);
-        	if(result.rows.length === 0) {
-                	return res.status(404).json({message: 'Task not found'});
-        	}
+		const result = await pool.query('SELECT * FROM task WHERE id = $1', [id]);
+		if(result.rows.length === 0) {
+	        	return res.status(404).json({message: 'Task not found'});
+		}
+		res.json(result.rows[0]);
+	} catch(error) {
+		next(error);
+	}
+}
+
+const createTask = async (req, res, next) => {
+	try {
+        	const { title, description } = req.body;
+        	const result = await pool.query(
+			'INSERT INTO task (title, description) VALUES ($1, $2) RETURNING *',
+			[title, description]
+		);
         	res.json(result.rows[0]);
-	});
+	} catch(error) {
+		next(error);
+	}
 }
 
-const createTask = async (req, res) => {
-	makeRequest(async () => {
-		try {
-                	const { title, description } = req.body;
-                	const result = await pool.query(
-				'INSERT INTO task (title, description) VALUES ($1, $2) RETURNING *',
-				[title, description]
-			);
-                	res.json(result.rows[0]);
-        	} catch(error) {
-                	res.status(500);
-                	res.json({error: "Ha ocurrido un error"});
-        	}
-	});
-}
-
-const deleteTask = async (req, res) => {
-	makeRequest(async () => {
+const deleteTask = async (req, res, next) => {
+	try {
 		const { id } = req.params;
 		const result = await pool.query('DELETE FROM task WHERE id = $1', [id]);
 		if(result.rowCount === 0) {
 			return res.status(404).json({message: 'Task not found'});
 		}
 		return res.sendStatus(204);
-	});
+	} catch(error) {
+		next(error);
+	}
 }
 
-const updateTask = async (req, res) => {
-	makeRequest(async () => {
+const updateTask = async (req, res, next) => {
+	try {
 		const { title, description } = req.body;
 		const { id } = req.params;
 		const result = await  pool.query(
@@ -71,7 +61,9 @@ const updateTask = async (req, res) => {
 			return res.status(404).json({message: 'Task not found'});
 		}
 		return res.json(result.rows[0]);
-	});
+	} catch(error) {
+		next(error);
+	}
 }
 
 module.exports = {
