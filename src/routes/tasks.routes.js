@@ -1,29 +1,17 @@
 const { Router } = require('express');
 const pool = require('../db');
+const { getTasks, getTask, createTask, deleteTask, updateTask } = require('../controllers/task.controller');
 
 const router = Router();
 
-router.get('/tasks', async (req, res) => {
-	const result = await pool.query('SELECT NOW()');
-	console.log(result);
-	res.json(result.rows[0].now);
-});
+router.get('/tasks', getTasks);
 
-router.get('/tasks/10', (req, res) => {
-        res.send('Retrieving a task');
-});
+router.get('/tasks/10', getTask);
 
-router.post('/tasks', (req, res) => {
-        res.send('Creating a list of tasks');
-});
+router.post('/tasks', createTask);
 
-router.delete('/tasks', (req, res) => {
-        res.send('Deleting a list of tasks');
-});
+router.delete('/tasks', deleteTask);
 
-router.put('/tasks', (req, res) => {
-        res.send('Updating a list of tasks');
-});
-
+router.put('/tasks', updateTask);
 
 module.exports = router;
