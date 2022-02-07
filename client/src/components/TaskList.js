@@ -3,10 +3,18 @@ import {Button, Card, CardContent, Typography} from "@mui/material";
 
 export default function TaskList() {
 	const [tasks, setTasks] = useState([]);
+
 	const loadTasks = async () => {
 		const response = await fetch('http://localhost:4000/tasks');
 		const data = await response.json();
 		setTasks(data);
+	}
+
+	const handleDelete = async id => {
+		const response = await fetch(`http://localhost:4000/tasks/${id}`, { method: 'DELETE' });
+		if(response.status === 204) {
+			setTasks(tasks.filter(task => task.id !== id));
+		}
 	}
 
 	useEffect(() => {
@@ -30,7 +38,7 @@ export default function TaskList() {
 							<Button
 								variant='contained'
 								color='warning'
-								onClick={() => console.log('deleting')}
+								onClick={() => handleDelete(task.id)}
 								style={{marginLeft: ".5rem"}}
 							>Delete</Button>
 						</div>
