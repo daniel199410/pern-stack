@@ -1,25 +1,28 @@
 import {Fragment, useEffect, useState} from "react";
 import {Button, Card, CardContent, Typography} from "@mui/material";
+import {useNavigate} from "react-router-dom";
 
 export default function TaskList() {
 	const [tasks, setTasks] = useState([]);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		loadTasks().then();
+	}, [])
 
 	const loadTasks = async () => {
 		const response = await fetch('http://localhost:4000/tasks');
 		const data = await response.json();
 		setTasks(data);
-	}
 
+	}
 	const handleDelete = async id => {
 		const response = await fetch(`http://localhost:4000/tasks/${id}`, { method: 'DELETE' });
 		if(response.status === 204) {
 			setTasks(tasks.filter(task => task.id !== id));
 		}
-	}
 
-	useEffect(() => {
-		loadTasks().then();
-	}, [])
+	}
 
 	return (
 		<Fragment>
@@ -32,7 +35,7 @@ export default function TaskList() {
 							<Typography>{task.description}</Typography>
 						</div>
 						<div>
-							<Button variant='contained' color='inherit' onClick={() => console.log('Updating')}>
+							<Button variant='contained' color='inherit' onClick={() => navigate(`/tasks/${task.id}/edit`)}>
 								Edit
 							</Button>
 							<Button
